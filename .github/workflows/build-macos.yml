@@ -14,7 +14,12 @@ jobs:
       - uses: seanmiddleditch/gha-setup-ninja@master
       - run: ./scripts/macos/download-cairo.sh
       - run: ninja -f build-macos.ninja
-      - run: ./scripts/pack.sh
+      - run: |
+          mkdir -p build/licenses/
+          cp LICENSE.txt build/licenses/bismite-font-sheeter-LICENSE.txt
+      - name: pack
+        working-directory: ./build
+        run: tar czf bismite-font-sheeter.tgz bin lib licenses
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:

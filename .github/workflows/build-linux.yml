@@ -14,7 +14,12 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       - run: ninja
-      - run: scripts/pack.sh
+      - run: |
+          mkdir -p build/licenses/
+          cp LICENSE.txt build/licenses/bismite-font-sheeter-LICENSE.txt
+      - name: pack
+        working-directory: ./build
+        run: tar czf bismite-font-sheeter.tgz bin licenses
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
