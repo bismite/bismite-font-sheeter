@@ -1,0 +1,25 @@
+name: Build Linux
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install libcairo2-dev ninja-build
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - run: ninja
+      - run: scripts/pack.sh
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: tmp/bismite-mruby-linux.tgz
+          asset_name: bismite-mruby-linux.tgz
+          tag: ${{ github.ref }}
+          overwrite: true

@@ -9,6 +9,7 @@ jobs:
     env:
       SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
     steps:
+      - uses: seanmiddleditch/gha-setup-ninja@master
       - name: Check out repository code
         uses: actions/checkout@v2
       - run: ./scripts/macos/download-cairo.sh

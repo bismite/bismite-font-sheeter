@@ -49,8 +49,9 @@ UTF-32 little endian codepoints. not UTF-8 or any others.
 example, 👺(Tengu) is [F0,9F,91,BA] in UTF-8, but 1F47A in codepoints file.
 
 # Build
-
-[cairo](https://cairographics.org) required. (e.g. `apt install libcairo2-dev`)
+require
+ - [cairo](https://cairographics.org) ( `apt install libcairo2-dev`)
+ - [ninja](https://ninja-build.org) ( `apt install ninja-build` )
 
 # License
 Copyright 2022 kbys <work4kbys@gmail.com>
