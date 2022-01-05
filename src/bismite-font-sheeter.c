@@ -14,6 +14,13 @@
 #include "simple_unicode.h"
 #include "codepoint.h"
 
+#define USAGE "uasge: font-sheet-maker <path/to/output.png> <OutputTextureWidth> <NumbersOfDatFiles> \\\n" \
+"  <DatFileName1> <NumbersOfFonts> \\\n" \
+"    <path/to/code_points_file> <path/to/font> <FontSize> <OutlineSize> \\\n" \
+"    ... \\\n" \
+"  <DatFileName2> <NumbersOfFonts> \\\n" \
+"    <path/to/code_points_file> <path/to/font> <FontSize> <OutlineSize> \\\n" \
+"    ...\n"
 
 typedef struct {
   const char* codepoint_file_name;
@@ -70,7 +77,7 @@ static int compare_glyph_height(const void* _a, const void* _b)
 
 void load_fonts( cairo_t *cr, FT_Library library, layout_data_file *d )
 {
-  printf("---- load_fonts %s ----\n", d->dat_file_name);
+  printf("---- %s ----\n", d->dat_file_name);
 
   // header
   d->header.version = 2;
@@ -168,9 +175,9 @@ void load_fonts( cairo_t *cr, FT_Library library, layout_data_file *d )
       l++;
     }
 
-    printf("Size:%d Font:%s(CP:%d) Height:%.1f Asc:%.1f Desc:%.1f max_x_advance:%.1f max_y_advance:%.1f\n",
-      f->font_size,
+    printf("Font:%s(CP:%d) Size:%d Height:%.1f Asc:%.1f Desc:%.1f max_x_advance:%.1f max_y_advance:%.1f\n",
       f->font_file_name, f->codepoint_num,
+      f->font_size,
       font_extents.height, font_extents.ascent, font_extents.descent,
       font_extents.max_x_advance, font_extents.max_y_advance
     );
@@ -185,17 +192,18 @@ void load_fonts( cairo_t *cr, FT_Library library, layout_data_file *d )
   d->header.font_size = highest_y_bearing + y_baseline;
   d->header.ascent = d->header.font_size - y_baseline;
   d->header.descent = y_baseline;
-  printf("  - total glyphs %d font_size:%d descent:%d\n", d->header.glyph_count, d->header.font_size, d->header.descent);
+  printf("%s glyphs:%d font_size:%d descent:%d\n",
+        d->dat_file_name, d->header.glyph_count, d->header.font_size, d->header.descent);
 }
 
 void parse_args(int argc, char** argv)
 {
-  printf("----\n");
   settings.image_name = argv[1];
   settings.texture_size = atoi(argv[2]);
   settings.data_num = atoi(argv[3]);
   settings.data_files = malloc( sizeof(layout_data_file) * settings.data_num );
   printf("Image:%s size:%d data-number:%d\n", settings.image_name, settings.texture_size, settings.data_num);
+  printf("----\n");
 
   int i=4;
   layout_data_file* l = settings.data_files;
@@ -204,7 +212,7 @@ void parse_args(int argc, char** argv)
     l->font_num = atoi(argv[i+1]);
     l->fonts = malloc( sizeof(font_data) * l->font_num );
     memset(l->layouts, 0, 0x110000);
-    printf("  Dat:%s Fonts:%d\n", l->dat_file_name, l->font_num);
+    printf("%s Fonts:%d\n", l->dat_file_name, l->font_num);
 
     i += 2;
     font_data* f = l->fonts;
@@ -213,9 +221,8 @@ void parse_args(int argc, char** argv)
       f->font_file_name = argv[i+j*4+1];
       f->font_size = atof(argv[i+j*4+2]);
       f->outline = atof(argv[i+j*4+3]);
-      printf("  - CP:%s Font:%s FontSize:%d Outline:%.2f\n",
+      printf("  Codepoints:%s Font:%s FontSize:%d Outline:%.2f\n",
         f->codepoint_file_name, f->font_file_name, f->font_size, f->outline );
-
       f++;
     }
     i += l->font_num * 4;
@@ -228,14 +235,8 @@ int main(int argc, char **argv)
   const int MARGIN_X = 2;
   const int MARGIN_Y = 2;
 
-  printf("start argc %d\n",argc);
-
-  if( argc<9 ){
-    printf( "argv shortage\n");
-    return 1;
-  }
-  if( (argc-4)%2 != 0 ) {
-    printf( "argv invlid num\n");
+  if( argc<9 || (argc-4)%2 != 0 ) {
+    printf(USAGE);
     return 1;
   }
 

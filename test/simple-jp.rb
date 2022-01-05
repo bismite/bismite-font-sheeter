@@ -34,6 +34,15 @@ texts.each{|text|
   label = Bi::Label.new font
   label.set_text text
   label.set_position 2, y
+  layer.root.add label
+  y += 18
+}
+
+y = 120
+texts.each{|text|
+  label = Bi::Label.new font
+  label.set_text text
+  label.set_position 2, y
   label.set_color 0xff-rand(50), 0xff-rand(50), 0xff-rand(50), 0xff
   label.set_background_color rand(100),rand(100),rand(100),0xff
   layer.root.add label
