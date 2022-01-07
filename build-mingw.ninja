@@ -1,0 +1,17 @@
+builddir = build
+cflags = -O2 -Wall -std=c11 -Ibuild/include/cairo -Ibuild/include/freetype2 -fdiagnostics-color=always
+ldflags = -lm -Lbuild/bin -lcairo-2 -lfreetype-6
+
+rule cc
+  command = x86_64-w64-mingw32-gcc -c $in -o $out $cflags
+
+rule link
+  command = x86_64-w64-mingw32-gcc $in -o $out $ldflags
+
+build build/bismite-font-sheeter.o: cc src/bismite-font-sheeter.c
+build build/bismite-codepoint-extractor.o: cc src/bismite-codepoint-extractor.c
+build build/simple_unicode.o: cc src/simple_unicode.c
+build build/codepoint.o: cc src/codepoint.c
+
+build build/bin/bismite-font-sheeter: link build/bismite-font-sheeter.o build/simple_unicode.o build/codepoint.o
+build build/bin/bismite-codepoint-extractor: link build/bismite-codepoint-extractor.o build/simple_unicode.o build/codepoint.o
