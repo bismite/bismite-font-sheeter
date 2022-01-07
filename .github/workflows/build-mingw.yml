@@ -1,4 +1,4 @@
-name: Build Linux
+name: Build Mingw
 on:
   push:
     tags:
@@ -13,6 +13,7 @@ jobs:
           sudo apt install mingw-w64 ninja-build
       - name: Check out repository code
         uses: actions/checkout@v2
+      - run: ./scripts/mingw/download-cairo.sh
       - run: ninja -f build-mingw.ninja
       - run: |
           mkdir -p build/licenses/
